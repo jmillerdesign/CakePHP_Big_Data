@@ -1,10 +1,10 @@
-h1. Big Data Behavior
+# Big Data Behavior
 
 An easy way to efficiently insert, update, and work with large amounts of data using CakePHP.
 
-h2. Background
+## Background
 
-My company uses CakePHP for most of our applications.  However, we were running into efficiency issues when working with large amounts of data.  
+My company uses CakePHP for most of our applications.  However, we were running into efficiency issues when working with large amounts of data.
 
 It's not uncommon for us to insert (or update) hundreds of thousands of rows with a single process.  Additionally, we needed an efficient way to work with those hundreds of thousands of pieces of data.
 
@@ -16,61 +16,57 @@ This bundle is stored in memory.  Upon saving the bundle, all of the model objec
 
 Additionally, this behavior allows CakePHP find results to be returned in the form of a hashed array.  The user can specify a 'key', which will serve as the key of the returned associative array.
 
-h2. Requirements
+## Requirements
+
 * CakePHP 1.3
 * PHP 5.2+
 * MySQL
 
-h2. Installation
-# Download this: https://github.com/jarriett/cake_big_data/zipball/master
-# Unzip the downloaded file
-# Copy the resulting folder to app/plugins
+## Installation
 
-h2. Issues
+1. Add this project to app/Plugin/BigData
+2. Load the plugin in app/Config/bootstrap.php:  
+```CakePlugin::load('BigData');```
+
+## Issues
+
 * If debugging is enabled, PHP notices are generated and logged.  If this behavior is being used for very large amounts of data, the log files can grow very quickly due to the generated PHP notices.
 
-h2. Usage
+## Usage
 
 Have your model use the behavior:
-<pre><code>
-<?php
-        App::Import('Model', 'BigDataModel');
-	class Frog extends BigDataModel
-	{
-	       var $actsAs = array('BigData');
-	}
-?>
-</code></pre>
-	 
+
+    <?php
+        class Frog extends BigDataModel {
+           public $actsAs = array('BigData');
+        }
+    ?>
+
 Now to insert 100,000 rows to the database in one database call, do the following:
-<pre><code>
-	for($i=0;$i <= 100000; $i++)
-	{
-		$frog = array();
-		$frog['Frog']['color'] = 'green';
-		$frog['Frog']['name'] = $i . " Froggy";
-		$frog['Frog']['unique_name'] = md5(mktime());
-		$frog['Frog']['species_id'] = 7;
-		$this->Frog->addToBundle($frog);
-	}
-	$this->Frog->saveBundle();
-//* Note: If a unique key exists on the database table, by default any rows matching the unique key will be updated,
-</code></pre>
+
+    for ($i = 0; $i <= 100000; $i++) {
+        $frog = array();
+        $frog['Frog']['color'] = 'green';
+        $frog['Frog']['name'] = $i . " Froggy";
+        $frog['Frog']['unique_name'] = md5(mktime());
+        $frog['Frog']['species_id'] = 7;
+        $this->Frog->addToBundle($frog);
+    }
+    $this->Frog->saveBundle();
+
+    // NOTE: If a unique key exists on the database table, by default any rows matching the unique key will be updated,
+
 To fetch a hashed result set from the database, call the fetchHashedResult() function as demonstrated below:
-<pre><code>
-		$frog_hash = $this->Frog->fetchHashedResult(array('conditions' => array('Frog.species_id' => 7), 'fields' => array('Frog.name', 'Frog.color'), 'key' => array('Frog.name', 'Frog.color')));
-</code></pre>
+
+    $frog_hash = $this->Frog->fetchHashedResult(array('conditions' => array('Frog.species_id' => 7), 'fields' => array('Frog.name', 'Frog.color'), 'key' => array('Frog.name', 'Frog.color')));
+
 The previous function call returns an associative array, where each object's key is <Frog.name> + <Frog.color>.  If you would like to md5 the key, can add the 'useHash' => true value to the parameter array.
 
-h2. Authors
+## Authors
 
 * Jarriett K. Robinson [jarriett (at) gmail.com] , http://github.com/jarriett
+* Modifications by J. Miller, http://github.com/jmillerdesign
 
-h2. License
+## License
 
 Licensed under the MIT License Redistributions of files must retain the above copyright notice.
-		
-		
-	
-	
-	
