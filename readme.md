@@ -1,24 +1,14 @@
-# Big Data Behavior
+# Big Data Behavior v2.0
 
-An easy way to efficiently insert, update, and work with large amounts of data using CakePHP.
+An easy way to efficiently insert/update large amounts of data using CakePHP.
 
 ## Background
 
-My company uses CakePHP for most of our applications.  However, we were running into efficiency issues when working with large amounts of data.
-
-It's not uncommon for us to insert (or update) hundreds of thousands of rows with a single process.  Additionally, we needed an efficient way to work with those hundreds of thousands of pieces of data.
-
-So, after some investigation I narrowed our efficiency problem to CakePHP sending data to the database, one row at a time.  This works great out of the box,
-
-but will really slow things down once large amounts of data come into play.  I remedied this by creating this behavior that allows a model to have a "bundle" of objects.
-
-This bundle is stored in memory.  Upon saving the bundle, all of the model objects are inserted into the database as a bulk insert, 100,000 items per insert by default.
-
-Additionally, this behavior allows CakePHP find results to be returned in the form of a hashed array.  The user can specify a 'key', which will serve as the key of the returned associative array.
+CakePHP is very slow at handling large amounts of data, because it inserts it one row at a time, and does several validation queries for each row. This plugin allows you to append each item to a "bundle" which is stored in memory, then save the entire bundle at once using a manual query. It will chunk the bundle if necessary, to split it into a few queries for better performance.
 
 ## Requirements
 
-* CakePHP 1.3
+* CakePHP 2.x
 * PHP 5.2+
 * MySQL
 
@@ -27,40 +17,26 @@ Additionally, this behavior allows CakePHP find results to be returned in the fo
 1. Add this project to app/Plugin/BigData
 2. Load the plugin in app/Config/bootstrap.php:  
 ```CakePlugin::load('BigData');```
-
-## Issues
-
-* If debugging is enabled, PHP notices are generated and logged.  If this behavior is being used for very large amounts of data, the log files can grow very quickly due to the generated PHP notices.
+3. Add as a behavior to the model(s):  
+```public $actsAs = array('BigData.BigData');```
 
 ## Usage
 
-Have your model use the behavior:
+Add each item to the bundle, to be saved later, by calling:
 
-    <?php
-        class Frog extends BigDataModel {
-           public $actsAs = array('BigData');
-        }
-    ?>
+    $this->addToBundle($data);
 
-Now to insert 100,000 rows to the database in one database call, do the following:
+Then, save the bundle to the database by calling:
 
-    for ($i = 0; $i <= 100000; $i++) {
-        $frog = array();
-        $frog['Frog']['color'] = 'green';
-        $frog['Frog']['name'] = $i . " Froggy";
-        $frog['Frog']['unique_name'] = md5(mktime());
-        $frog['Frog']['species_id'] = 7;
-        $this->Frog->addToBundle($frog);
-    }
-    $this->Frog->saveBundle();
+    $this->saveBundle();
 
-    // NOTE: If a unique key exists on the database table, by default any rows matching the unique key will be updated,
+The bundle will save in chunks of 10,000 items by default, or you can pass in the max number of items to save per query:
 
-To fetch a hashed result set from the database, call the fetchHashedResult() function as demonstrated below:
+    $this->saveBundle(1000);
 
-    $frog_hash = $this->Frog->fetchHashedResult(array('conditions' => array('Frog.species_id' => 7), 'fields' => array('Frog.name', 'Frog.color'), 'key' => array('Frog.name', 'Frog.color')));
+If you are saving a row that already exists in the database, it will replace it by default. You can turn off replacement by passing ```false``` as the second argument
 
-The previous function call returns an associative array, where each object's key is <Frog.name> + <Frog.color>.  If you would like to md5 the key, can add the 'useHash' => true value to the parameter array.
+    $this->saveBundle(null, false);
 
 ## Authors
 
