@@ -110,11 +110,11 @@ class BigDataBehavior extends ModelBehavior {
  * @return mixed Default value
  */
 	protected function _generateEmptyValue($fieldSchema) {
-		if ($fieldSchema['null']) {
+		if (array_key_exists('null', $fieldSchema) && $fieldSchema['null']) {
 			return 'NULL';
 		}
 
-		if (!$fieldSchema['default']) {
+		if (!array_key_exists('default', $fieldSchema) || !$fieldSchema['default']) {
 			switch ($fieldSchema['type']) {
 				case 'string':   return '';
 				case 'date':     return date('Y-m-d');
