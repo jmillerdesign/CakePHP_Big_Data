@@ -14,9 +14,9 @@ class BigDataBehavior extends ModelBehavior {
  * @param array $config Configuration settings for $model
  * @return void
  */
-	public function setup(Model &$Model, $config = array()) {
+	public function setup(Model $model, $config = array()) {
 		// Current model
-		$this->_Model = $Model;
+		$this->_Model = $model;
 
 		// Bundle of items to save
 		$this->_Model->_bundle = array();
@@ -25,17 +25,17 @@ class BigDataBehavior extends ModelBehavior {
 /**
  * Add an array to the bundle, to be saved later
  *
- * @param Model $Model Model using this behavior
+ * @param Model $model Model using this behavior
  * @param array $modelData Data to be saved
  * @return void
  */
-	public function addToBundle(Model &$Model, $modelData) {
-		$this->_Model = $Model;
+	public function addToBundle(Model $model, $modelData) {
+		$this->_Model = $model;
 
 		// Remove model name from array, if it exists
 		// Append item to the bundle array
-		if (array_key_exists($Model->name, $modelData)) {
-			$this->_Model->_bundle[] = $this->_prepareItemForSaving($modelData[$Model->name]);
+		if (array_key_exists($model->name, $modelData)) {
+			$this->_Model->_bundle[] = $this->_prepareItemForSaving($modelData[$model->name]);
 		} else {
 			$this->_Model->_bundle[] = $this->_prepareItemForSaving($modelData);
 		}
@@ -44,13 +44,13 @@ class BigDataBehavior extends ModelBehavior {
 /**
  * Save all items in the bundle, then reset the bundle
  *
- * @param Model $Model Model using this behavior
+ * @param Model $model Model using this behavior
  * @param integer $maxPayload Maximum number of items to save per query
  * @param boolean $replace True to replace data, if it already exists
  * @return void
  */
-	public function saveBundle(Model &$Model, $maxPayload = 10000, $replace = true) {
-		$this->_Model = $Model;
+	public function saveBundle(Model $model, $maxPayload = 10000, $replace = true) {
+		$this->_Model = $model;
 
 		if (count($this->_Model->_bundle) > $maxPayload) {
 			$chunks = array_chunk($this->_Model->_bundle, $maxPayload);
