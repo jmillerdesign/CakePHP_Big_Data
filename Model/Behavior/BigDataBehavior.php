@@ -134,22 +134,30 @@ class BigDataBehavior extends ModelBehavior {
  * @return array Data to be saved
  */
 	protected function _prepareItemForSaving($modelData) {
+		$formattedData = array();
+
 		foreach ($this->_Model->schema() as $fieldName => $fieldSchema) {
 			if (!array_key_exists($fieldName, $modelData)) {
 				// Schema exists, but is not set in the model data
 				// Insert the default value, unless it is the primary key
 				if (!array_key_exists('key', $fieldSchema) || ($fieldSchema['key'] != 'primary')) {
-					$modelData[$fieldName] = $this->_generateEmptyValue($fieldSchema);
+					$value = $this->_generateEmptyValue($fieldSchema);
+				} else {
+					$value = $modelData[$fieldName];
 				}
+			} else {
+				$value = $modelData[$fieldName];
 			}
 
 			// Wrap values in quotes, for SQL string
-			if ($modelData[$fieldName] != 'NULL') {
-				$modelData[$fieldName] = '"' . $modelData[$fieldName] . '"';
+			if (strtoupper($value) != 'NULL') {
+				$value = '"' . $value . '"';
 			}
+
+			$formattedData[$fieldName] = $value;
 		}
 
-		return $modelData;
+		return $formattedData;
 	}
 
 }
