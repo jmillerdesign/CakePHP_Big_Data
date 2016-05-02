@@ -77,7 +77,7 @@ class BigDataBehavior extends ModelBehavior {
 		}
 
 		$table = Inflector::tableize($this->_Model->name);
-		$fieldNames = array_keys($this->_Model->schema());
+		$fieldNames = array_map(function($n) { return "`$n`"; }, array_keys($this->_Model->schema()));
 
 		$sql = sprintf('INSERT INTO `%s` (%s) VALUES', $table, implode(',', $fieldNames));
 
