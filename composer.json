@@ -1,0 +1,12 @@
+{
+    "name":"infostreams/cakephp_big_data",
+    "description":"CakePHP BigData plugin",
+    "version":"2.0.0",
+    "type": "cakephp-plugin",
+    "require": {
+        "composer/installers": "*"
+    },
+    "extra": {
+        "installer-name": "BigData"
+    }
+}
